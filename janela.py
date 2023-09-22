@@ -11,9 +11,13 @@ class GUI_main_window(QDialog):
         loadUi("main_window.ui", self)
         self.show()
         
-        #Imagem do campo
-        pixmap = QPixmap('Field.jpg')
-        self.QT_jogar.setPixmap(pixmap)
+        #Imagem campo
+        pixmap = cv2.imread('Field.jpg')
+        pixmap = cv2.rectangle(pixmap, (50,50),(100,100), (255,0,0), -1)
+        #Corrigir ângulo da imagem
+        _q_image = QImage(pixmap, pixmap.shape[1], pixmap.shape[0], QImage.Format_RGB888)
+        _q_pixmap = QPixmap.fromImage(_q_image)
+        self.QT_jogar.setPixmap(_q_pixmap)
 
         self.btPararTransmissao.clicked.connect(self.terminarTransmissao)
         self.btJogar.clicked.connect(self.iniciarTransmissao)
