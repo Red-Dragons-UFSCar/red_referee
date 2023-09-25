@@ -321,96 +321,6 @@ background-color: #9F1823;
     <string>TextLabel</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="QT_btQ1">
-   <property name="geometry">
-    <rect>
-     <x>1060</x>
-     <y>410</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(255,255,255);
-background-color: #9F1823;
-</string>
-   </property>
-   <property name="text">
-    <string>Q1</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="QT_btQ2">
-   <property name="geometry">
-    <rect>
-     <x>970</x>
-     <y>410</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(255,255,255);
-background-color: #9F1823;
-</string>
-   </property>
-   <property name="text">
-    <string>Q2</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="QT_btBlue">
-   <property name="geometry">
-    <rect>
-     <x>1020</x>
-     <y>350</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(255,255,255);
-background-color: #9F1823;
-</string>
-   </property>
-   <property name="text">
-    <string>Blue</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="QT_btStop">
-   <property name="geometry">
-    <rect>
-     <x>1120</x>
-     <y>90</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(255,255,255);
-background-color: #9F1823;
-</string>
-   </property>
-   <property name="text">
-    <string>Stop</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="QT_btQ4">
-   <property name="geometry">
-    <rect>
-     <x>1060</x>
-     <y>440</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(255,255,255);
-background-color: #9F1823;
-</string>
-   </property>
-   <property name="text">
-    <string>Q4</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="QT_btKickOff">
    <property name="geometry">
     <rect>
@@ -434,24 +344,6 @@ QPushButton:hover{
    </property>
    <property name="text">
     <string>Kickoff</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="QT_btQ3">
-   <property name="geometry">
-    <rect>
-     <x>970</x>
-     <y>440</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(255,255,255);
-background-color: #9F1823;
-</string>
-   </property>
-   <property name="text">
-    <string>Q3</string>
    </property>
   </widget>
   <widget class="QLabel" name="qt_FaltaAtual">
@@ -497,43 +389,6 @@ QPushButton:hover{
    </property>
    <property name="text">
     <string>Free Ball</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="QT_btYellow">
-   <property name="geometry">
-    <rect>
-     <x>1020</x>
-     <y>320</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(255,255,255);
-background-color: #9F1823;
-
-</string>
-   </property>
-   <property name="text">
-    <string>Yellow</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="QT_btStart">
-   <property name="geometry">
-    <rect>
-     <x>970</x>
-     <y>90</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:rgb(255,255,255);
-background-color: #9F1823;
-</string>
-   </property>
-   <property name="text">
-    <string>Start</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btPararTransmissao">
@@ -733,22 +588,227 @@ QPushButton:hover{
     <string>Parar transmissão</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="QT_btHalt">
+  <widget class="QPushButton" name="QT_btStop">
    <property name="geometry">
     <rect>
-     <x>1040</x>
-     <y>130</y>
-     <width>81</width>
-     <height>20</height>
+     <x>1080</x>
+     <y>110</y>
+     <width>131</width>
+     <height>16</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">color:rgb(255,255,255);
-background-color: #9F1823;
-</string>
+    <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: #9F1823;
+	border-radius:0px;
+}
+QPushButton:hover{
+	color: rgb(255, 255, 255);
+	background-color: #ff0000;
+	border-radius:0px;
+}</string>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="QT_btHalt">
+   <property name="geometry">
+    <rect>
+     <x>1000</x>
+     <y>140</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: #9F1823;
+	border-radius:0px;
+}
+QPushButton:hover{
+	color: rgb(255, 255, 255);
+	background-color: #ff0000;
+	border-radius:0px;
+}</string>
    </property>
    <property name="text">
     <string>Halt</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="QT_btStart">
+   <property name="geometry">
+    <rect>
+     <x>930</x>
+     <y>110</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: #9F1823;
+	border-radius:0px;
+}
+QPushButton:hover{
+	color: rgb(255, 255, 255);
+	background-color: #ff0000;
+	border-radius:0px;
+}</string>
+   </property>
+   <property name="text">
+    <string>Start</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="QT_btQ1">
+   <property name="geometry">
+    <rect>
+     <x>1070</x>
+     <y>410</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: #9F1823;
+	border-radius:0px;
+}
+QPushButton:hover{
+	color: rgb(255, 255, 255);
+	background-color: #ff0000;
+	border-radius:0px;
+}</string>
+   </property>
+   <property name="text">
+    <string>Q1</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="QT_btQ4">
+   <property name="geometry">
+    <rect>
+     <x>1070</x>
+     <y>440</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: #9F1823;
+}
+QPushButton:hover{
+	color: rgb(255, 255, 255);
+	background-color: #ff0000;
+}</string>
+   </property>
+   <property name="text">
+    <string>Q4</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="QT_btQ3">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>440</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: #9F1823;
+	border-radius:0px;
+}
+QPushButton:hover{
+	color: rgb(255, 255, 255);
+	background-color: #ff0000;
+	border-radius:0px;
+}</string>
+   </property>
+   <property name="text">
+    <string>Q3</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="QT_btQ2">
+   <property name="geometry">
+    <rect>
+     <x>920</x>
+     <y>410</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: #9F1823;
+	border-radius:0px;
+}
+QPushButton:hover{
+	color: rgb(255, 255, 255);
+	background-color: #ff0000;
+	border-radius:0px;
+}</string>
+   </property>
+   <property name="text">
+    <string>Q2</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="QT_btBlue">
+   <property name="geometry">
+    <rect>
+     <x>1000</x>
+     <y>350</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: #9F1823;
+	border-radius:0px;
+}
+QPushButton:hover{
+	color: rgb(255, 255, 255);
+	background-color: #ff0000;
+	border-radius:0px;
+}</string>
+   </property>
+   <property name="text">
+    <string>Blue</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="QT_btYellow">
+   <property name="geometry">
+    <rect>
+     <x>1000</x>
+     <y>320</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: #9F1823;
+	border-radius:0px;
+}
+QPushButton:hover{
+	color: rgb(255, 255, 255);
+	background-color: #ff0000;
+	border-radius:0px;
+}</string>
+   </property>
+   <property name="text">
+    <string>Yellow</string>
    </property>
   </widget>
  </widget>
