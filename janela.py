@@ -135,6 +135,19 @@ class GUI_main_window(QDialog):
             ]
         ).astype(int)
         
+    def cm_to_pxl(self,x,y):
+        #Cm 170x130
+        #pxl 850x650
+        #Origem dos cm, canto inferior esquerdo, cresce para cima
+        #Origem dos pxl, canto superior esquerdo, cresce para baixo
+        novo_x = x
+        novo_y = y
+        """
+        pos_bolax = (imagem.centroids[0][0][0][0])*170/640
+        pos_bolay = ((480 - imagem.centroids[0][0][0][1])*130/480)
+        """
+
+        return novo_x, novo_y
 
     def edges_robot(self,x,y):
         x1 = x-14.5
@@ -174,7 +187,8 @@ class GUI_main_window(QDialog):
         self.pixmap = cv2.imread('Field.jpg')
         for i in range(0,3):
             try:
-                p1,p2,p3,p4 = self.edges_robot(self.Entidades_Azul[i].x,self.Entidades_Azul[i].y)
+                novo_x, novo_y= self.cm_to_pxl(self.Entidades_Azul[i].x,self.Entidades_Azul[i].y)
+                p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
                 team = "blue"
                 self.draw_robot(p1,p2,p3,p4,self.Entidades_Azul[i].a, team)
                 print(i)
