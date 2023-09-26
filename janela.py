@@ -52,110 +52,6 @@ class GUI_main_window(QDialog):
         super(GUI_main_window, self).__init__()
         loadUi("main_window.ui", self)
         self.show()
-        
-        
-
-        Robo0Amarelo = Entity_Yellow(index = 0)
-        Robo1Amarelo = Entity_Yellow(index = 1)
-        Robo2Amarelo = Entity_Yellow(index = 2)
-
-
-        Entidades_Amarelas = [Robo0Amarelo, Robo1Amarelo, Robo2Amarelo]
-
-        Robo0Azul = Entity_Blue(index = 0)
-        Robo1Azul = Entity_Blue(index = 1)
-        Robo2Azul = Entity_Blue(index = 2)
-
-
-        Entidades_Azul = [Robo0Azul, Robo1Azul, Robo2Azul]
-
-        Entidade_Bola = Entity_ball
-
-
-        def rotate(points, angle):
-            ANGLE = np.deg2rad(angle)
-            SIN = math.sin(ANGLE)
-            COS = math.cos(ANGLE)
-            
-            
-            c_x, c_y = np.mean(points, axis=0)
-
-            return np.array(
-                [
-                    [
-                        c_x + COS * (px - c_x) - SIN * (py - c_y),
-                        c_y + SIN * (px - c_x) + COS * (py - c_y),
-                    ]
-                    for px, py in points
-                ]
-            ).astype(int)
-        
-
-        def edges_robot(x,y):
-            x1 = x-14.5
-            x2 = x+14.5
-            y1 = y-14.5
-            y2 = y+14.5
-            return (x1,y1),(x1,y2),(x2,y2),(x2,y1)
-
-
-        def draw_robot(p1,p2,p3,p4,angle,team):
-            if team == "blue":
-                p1_draw,p2_draw,p3_draw,p4_draw = rotate((p1,p2,p3,p4),angle)
-                pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
-                cv2.drawContours(self.pixmap, [pp], -1, (0, 0, 255), -1)
-            else:
-                p1_draw,p2_draw,p3_draw,p4_draw = rotate((p1,p2,p3,p4),angle)
-                pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
-                cv2.drawContours(self.pixmap, [pp], -1, (255, 255, 0), -1)
-                
-
-        
-        for i in range(0,3):
-            Entidades_Azul[i].x = 100 + i*50
-            Entidades_Azul[i].y = 200 + i*50
-            Entidades_Azul[i].a = 10 + i*30
-            Entidades_Amarelas[i].x = 600 + i*50
-            Entidades_Amarelas[i].y = 400 + i*50
-            Entidades_Amarelas[i].a = 10 + i*50
-            Entidade_Bola.x = i*50
-            Entidade_Bola.y = i*50
-
-
-
-        def draw_all():
-            self.pixmap = cv2.imread('Field.jpg')
-            for i in range(0,3):
-                try:
-                    p1,p2,p3,p4 = edges_robot(Entidades_Azul[i].x,Entidades_Azul[i].y)
-                    team = "blue"
-                    draw_robot(p1,p2,p3,p4,Entidades_Azul[i].a, team)
-                except IndexError:
-                    pass
-                    
-            for i in range(0,3):
-                try:
-                    p1,p2,p3,p4 = edges_robot(Entidades_Amarelas[i].x,Entidades_Amarelas[i].y)
-                    team = "Yellow"
-                    draw_robot(p1,p2,p3,p4,Entidades_Amarelas[i].a, team)
-                except IndexError:
-                    pass
-
-
-        draw_all()
-
-        _q_image = QImage(self.pixmap, self.pixmap.shape[1], self.pixmap.shape[0], self.pixmap.strides[0], QImage.Format_RGB888)
-        _q_pixmap = QPixmap.fromImage(_q_image)
-        self.QT_jogar.setPixmap(_q_pixmap)
-
-        """
-        Corrigir ângulo da imagem
-
-        Não sei o pq precisa ser assim, mas sempre que tentei gerar a imagem de outra forma deu erro, dúvida? fica alterando os valores de pixmap.shape/pixmap.stride
-        """
-        
-
-        
 
         #Parte do juíz
         self.btPararTransmissao.clicked.connect(self.terminarTransmissao)
@@ -196,7 +92,114 @@ class GUI_main_window(QDialog):
         self.FaltaAnterior = 4
         self.CorAnterior = 2
 
+        #self.contador_pos = 0
+
         #self.referee = Referee()
+        
+        
+
+        Robo0Amarelo = Entity_Yellow(index = 0)
+        Robo1Amarelo = Entity_Yellow(index = 1)
+        Robo2Amarelo = Entity_Yellow(index = 2)
+
+
+        self.Entidades_Amarelas = [Robo0Amarelo, Robo1Amarelo, Robo2Amarelo]
+
+        Robo0Azul = Entity_Blue(index = 0)
+        Robo1Azul = Entity_Blue(index = 1)
+        Robo2Azul = Entity_Blue(index = 2)
+
+
+        self.Entidades_Azul = [Robo0Azul, Robo1Azul, Robo2Azul]
+
+        self.Entidade_Bola = Entity_ball
+
+        self.draw_all()
+
+
+    def rotate(self,points, angle):
+        ANGLE = np.deg2rad(angle)
+        SIN = math.sin(ANGLE)
+        COS = math.cos(ANGLE)
+        
+        
+        c_x, c_y = np.mean(points, axis=0)
+
+        return np.array(
+            [
+                [
+                    c_x + COS * (px - c_x) - SIN * (py - c_y),
+                    c_y + SIN * (px - c_x) + COS * (py - c_y),
+                ]
+                for px, py in points
+            ]
+        ).astype(int)
+        
+
+    def edges_robot(self,x,y):
+        x1 = x-14.5
+        x2 = x+14.5
+        y1 = y-14.5
+        y2 = y+14.5
+        return (x1,y1),(x1,y2),(x2,y2),(x2,y1)
+
+
+    def draw_robot(self,p1,p2,p3,p4,angle,team):
+        if team == "blue":
+            p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),angle)
+            pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
+            cv2.drawContours(self.pixmap, [pp], -1, (0, 0, 255), -1)
+        else:
+            p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),angle)
+            pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
+            cv2.drawContours(self.pixmap, [pp], -1, (255, 255, 0), -1)
+                
+
+
+    def draw_all(self):
+        self.looping_img = threading.Timer(1, self.draw_all)
+        """
+        self.contador_pos = self.contador_pos + 50
+        for i in range(0,3):
+            self.Entidades_Azul[i].x = 100 + self.contador_pos*0.1
+            self.Entidades_Azul[i].y = 200 + self.contador_pos*0.1
+            self.Entidades_Azul[i].a = 10 + self.contador_pos*0.1
+            self.Entidades_Amarelas[i].x = 600 + self.contador_pos*0.1
+            self.Entidades_Amarelas[i].y = 400 + self.contador_pos*0.1
+            self.Entidades_Amarelas[i].a = 10 + self.contador_pos*0.1
+            self.Entidade_Bola.x = self.contador_pos*0.1
+            self.Entidade_Bola.y = self.contador_pos*0.1
+        """
+        self.looping_img.start()
+        self.pixmap = cv2.imread('Field.jpg')
+        for i in range(0,3):
+            try:
+                p1,p2,p3,p4 = self.edges_robot(self.Entidades_Azul[i].x,self.Entidades_Azul[i].y)
+                team = "blue"
+                self.draw_robot(p1,p2,p3,p4,self.Entidades_Azul[i].a, team)
+                print(i)
+                print(self.Entidades_Amarelas[i].x)
+            except IndexError:
+                pass
+                
+        for i in range(0,3):
+            try:
+                p1,p2,p3,p4 = self.edges_robot(self.Entidades_Amarelas[i].x,self.Entidades_Amarelas[i].y)
+                team = "Yellow"
+                self.draw_robot(p1,p2,p3,p4,self.Entidades_Amarelas[i].a, team)
+            except IndexError:
+                pass
+
+        _q_image = QImage(self.pixmap, self.pixmap.shape[1], self.pixmap.shape[0], self.pixmap.strides[0], QImage.Format_RGB888)
+        _q_pixmap = QPixmap.fromImage(_q_image)
+        self.QT_jogar.setPixmap(_q_pixmap)
+        """
+        Corrigir ângulo da imagem
+
+        Não sei o pq precisa ser assim, mas sempre que tentei gerar a imagem de outra forma deu erro, dúvida? fica alterando os valores de pixmap.shape/pixmap.stride
+        """
+
+        
 
     def mudanca_quadrante(self,enum):
         if enum == 1:
@@ -439,8 +442,10 @@ class GUI_main_window(QDialog):
     def closeEvent(self,event):
         try:
             self.looping.cancel()
+            self.looping_img.cancel()
             event.accept()
         except:
+            self.looping_img.cancel()
             event.accept()
 
     
