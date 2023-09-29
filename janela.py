@@ -71,9 +71,10 @@ class GUI_main_window(QDialog):
 
         
         self.looping_img = threading.Timer(0.005, self.draw_all)
-        self.draw_all()
+        self.looping_img.start()
+        self.looping_img.join()
 
-        
+
 
     def rotate(self,points, angle):
 
@@ -184,9 +185,7 @@ class GUI_main_window(QDialog):
         self.robots_yellow = self.field[0]["robots_yellow"]
         self.ball= self.field[0]["ball"]
 
-        self.draw_robot()
-        
-        self.looping_img.start()     
+        self.draw_robot()  
        
 
         
