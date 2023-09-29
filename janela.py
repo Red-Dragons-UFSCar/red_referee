@@ -68,9 +68,9 @@ class GUI_main_window(QDialog):
         self.draw_all()
         
 
-        #self.mray = False
-        #self.referee = Referee()
-        #self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
+        self.mray = False
+        self.referee = Referee()
+        self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
 
 
     def rotate(self,points, angle):
@@ -173,12 +173,12 @@ class GUI_main_window(QDialog):
 
     def draw_all(self):
         
-        #self.vision.update(self.mray)
-        #self.field = self.vision.get_data()
+        self.vision.update(self.mray)
+        self.field = self.vision.get_data()
 
-        #self.robots_blue = self.field[0]["robots_blue"]
-        #self.robots_yellow = self.field[0]["robots_yellow"]
-        #self.ball= self.field[0]["ball"]
+        self.robots_blue = self.field[0]["robots_blue"]
+        self.robots_yellow = self.field[0]["robots_yellow"]
+        self.ball= self.field[0]["ball"]
 
         self.draw_robot()
 
@@ -254,7 +254,7 @@ class GUI_main_window(QDialog):
                 self.QT_btFreeBall.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btGoalKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            #self.cria_dic()
+            self.cria_dic()
             self.quadrante = 0
         elif enum == 2:
             if self.FaltaAtual == 2:
@@ -269,7 +269,7 @@ class GUI_main_window(QDialog):
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.color = 2
                 self.RegistraFalta()
-            #self.cria_dic()
+            self.cria_dic()
             self.quadrante = 0
 
         elif enum == 4:
@@ -284,7 +284,7 @@ class GUI_main_window(QDialog):
                 self.QT_btFreeBall.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            #self.cria_dic()
+            self.cria_dic()
             self.quadrante = 0
         elif enum == 3:
             self.color = 2
@@ -300,7 +300,7 @@ class GUI_main_window(QDialog):
                 self.QT_btKickOff.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            #self.cria_dic()
+            self.cria_dic()
             
         elif enum == 5:
                 self.QT_btStop.setStyleSheet("background-color:green")
@@ -310,7 +310,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btHalt.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStart.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                #self.cria_dic()
+                self.cria_dic()
         elif enum == 6:
                 self.QT_btStart.setStyleSheet("background-color:green")
                 
@@ -319,7 +319,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btHalt.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStop.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                #self.cria_dic()
+                self.cria_dic()
         elif enum == 7:
                 self.QT_btHalt.setStyleSheet("background-color:green")
                 
@@ -328,7 +328,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btStop.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStart.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                #self.cria_dic()
+                self.cria_dic()
 
     def mudanca_teamcolor(self, enum):
         if enum == 0:
@@ -428,7 +428,7 @@ class GUI_main_window(QDialog):
 
     def iniciarTransmissao(self):
         self.looping = threading.Timer(0.02, self.iniciarTransmissao)
-        #self.cria_dic()
+        self.cria_dic()
         self.looping.start()
 
     def terminarTransmissao(self):
