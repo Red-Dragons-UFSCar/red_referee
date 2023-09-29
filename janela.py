@@ -69,8 +69,11 @@ class GUI_main_window(QDialog):
         self.referee = Referee()
         self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
 
+        
         self.looping_img = threading.Timer(0.005, self.draw_all)
-        self.looping_img.start()
+        self.draw_all()
+
+        
 
     def rotate(self,points, angle):
 
@@ -183,9 +186,7 @@ class GUI_main_window(QDialog):
 
         self.draw_robot()
         
-        self.looping_img.start()
-
-        
+        self.looping_img.start()     
        
 
         
