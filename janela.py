@@ -122,7 +122,6 @@ class GUI_main_window(QDialog):
 
 
     def draw_robot(self,p1,p2,p3,p4,angle,team):
-        
         cache = img.copy() 
         
         if team == "blue":
@@ -142,6 +141,15 @@ class GUI_main_window(QDialog):
                 pass
             except AttributeError:
                 pass
+
+        """
+        Corrigir ângulo da imagem
+
+        Não sei o pq precisa ser assim, mas sempre que tentei gerar a imagem de outra forma deu erro, duvida? Fica alterando os valores de pixmap.shape/pixmap.stride
+        """
+        _q_image = QImage(cache, cache.shape[1], cache.shape[0], cache.strides[0], QImage.Format_RGB888)
+        _q_pixmap = QPixmap.fromImage(_q_image)
+        self.QT_jogar.setPixmap(_q_pixmap)
                 
 
 
@@ -179,16 +187,6 @@ class GUI_main_window(QDialog):
                 pass
             except AttributeError:
                 pass
-
-
-        """
-        Corrigir ângulo da imagem
-
-        Não sei o pq precisa ser assim, mas sempre que tentei gerar a imagem de outra forma deu erro, duvida? Fica alterando os valores de pixmap.shape/pixmap.stride
-        """
-        _q_image = QImage(cache, cache.shape[1], cache.shape[0], cache.strides[0], QImage.Format_RGB888)
-        _q_pixmap = QPixmap.fromImage(_q_image)
-        self.QT_jogar.setPixmap(_q_pixmap)
 
         self.looping_img = threading.Timer(0.005, self.draw_all)
         self.looping_img.start()
