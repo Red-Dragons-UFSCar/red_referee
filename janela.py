@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import math
 
-#from vss_communication import StrategyControl, Referee
+from vss_communication import StrategyControl, Referee
 
 
 class GUI_main_window(QDialog):
