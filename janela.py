@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import math
 
-from vss_communication import StrategyControl, Referee
+#from vss_communication import StrategyControl, Referee
 
 
 class GUI_main_window(QDialog):
@@ -64,12 +64,13 @@ class GUI_main_window(QDialog):
         global img
         global cache
         img = cv2.imread('Field.jpg')
+
+        self.draw_all()
         
 
-        self.mray = False
-        self.referee = Referee()
-        self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
-        self.draw_all()
+        #self.mray = False
+        #self.referee = Referee()
+        #self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
 
 
     def rotate(self,points, angle):
@@ -121,26 +122,43 @@ class GUI_main_window(QDialog):
         return (x1,y1),(x1,y2),(x2,y2),(x2,y1)
 
 
-    def draw_robot(self,p1,p2,p3,p4,angle,team):
-        cache = img.copy() 
-        
-        if team == "blue":
-            p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),angle)
-            pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
-            cv2.drawContours(cache, [pp], -1, (0, 0, 255), -1)
-        elif team == "yellow":
-            p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),angle)
-            pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
-            cv2.drawContours(cache, [pp], -1, (255, 255, 0), -1)
-        else:
+    def draw_robot(self):
+        cache = img.copy()
+
+        for i in range(0,3):
             try:
-                coordenadas_cm_x, coordenadas_cm_y = self.cm_to_pxl(self.ball[0]['x'], self.ball[0]['y']) 
-                coordenadas_pxl = (int(coordenadas_cm_x),int(coordenadas_cm_y))
-                cv2.circle(cache, coordenadas_pxl, int(10.5), (265,165,0), -1)
+                novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
+                p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
+                p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),self.robots_blue[i]['orientation'])
+                pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
+                cv2.drawContours(cache, [pp], -1, (0, 0, 255), -1)
             except IndexError:
                 pass
             except AttributeError:
                 pass
+
+        for i in range(0,3):
+            try:
+                novo_x, novo_y = self.cm_to_pxl(self.robots_yellow[i]['x'], self.robots_yellow[i]['y'])
+                p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
+                p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),self.robots_yellow[i]['orientation'])
+                pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
+                cv2.drawContours(cache, [pp], -1, (255, 255, 0), -1)
+            except IndexError:
+                pass
+            except AttributeError:
+                pass
+        
+
+        try:
+            coordenadas_cm_x, coordenadas_cm_y = self.cm_to_pxl(self.ball['x'], self.ball['y']) 
+            #coordenadas_cm_x, coordenadas_cm_y = self.cm_to_pxl(100, 100)
+            coordenadas_pxl = (int(coordenadas_cm_x),int(coordenadas_cm_y))
+            cv2.circle(cache, coordenadas_pxl, int(10.5), (265,165,0), -1)
+        except IndexError:
+            pass
+        except AttributeError:
+            pass
 
         """
         Corrigir ângulo da imagem
@@ -155,38 +173,14 @@ class GUI_main_window(QDialog):
 
     def draw_all(self):
         
-        self.vision.update(self.mray)
-        self.field = self.vision.get_data()
+        #self.vision.update(self.mray)
+        #self.field = self.vision.get_data()
 
-        self.robots_blue = self.field[0]["robots_blue"]
-        self.robots_yellow = self.field[0]["robots_yellow"]
-        self.ball= self.field[0]["ball"]
+        #self.robots_blue = self.field[0]["robots_blue"]
+        #self.robots_yellow = self.field[0]["robots_yellow"]
+        #self.ball= self.field[0]["ball"]
 
-        #Desenho da bola
-        self.draw_robot(0,0,0,0,0,"ball")
-
-
-        for i in range(0,3):
-            try:
-                novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
-                p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
-                team = "blue"
-                self.draw_robot(p1,p2,p3,p4,self.robots_blue[i]['orientation'], team)
-            except IndexError:
-                pass
-            except AttributeError:
-                pass
-
-        for i in range(0,3):
-            try:
-                novo_x, novo_y = self.cm_to_pxl(self.robots_yellow[i]['x'], self.robots_yellow[i]['y'])
-                p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
-                team = "yellow"
-                self.draw_robot(p1,p2,p3,p4,self.robots_yellow[i]['orientation'], team)
-            except IndexError:
-                pass
-            except AttributeError:
-                pass
+        self.draw_robot()
 
         self.looping_img = threading.Timer(0.005, self.draw_all)
         self.looping_img.start()
@@ -260,7 +254,7 @@ class GUI_main_window(QDialog):
                 self.QT_btFreeBall.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btGoalKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            self.cria_dic()
+            #self.cria_dic()
             self.quadrante = 0
         elif enum == 2:
             if self.FaltaAtual == 2:
@@ -275,7 +269,7 @@ class GUI_main_window(QDialog):
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.color = 2
                 self.RegistraFalta()
-            self.cria_dic()
+            #self.cria_dic()
             self.quadrante = 0
 
         elif enum == 4:
@@ -290,7 +284,7 @@ class GUI_main_window(QDialog):
                 self.QT_btFreeBall.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            self.cria_dic()
+            #self.cria_dic()
             self.quadrante = 0
         elif enum == 3:
             self.color = 2
@@ -306,7 +300,7 @@ class GUI_main_window(QDialog):
                 self.QT_btKickOff.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            self.cria_dic()
+            #self.cria_dic()
             
         elif enum == 5:
                 self.QT_btStop.setStyleSheet("background-color:green")
@@ -316,7 +310,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btHalt.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStart.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                self.cria_dic()
+                #self.cria_dic()
         elif enum == 6:
                 self.QT_btStart.setStyleSheet("background-color:green")
                 
@@ -325,7 +319,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btHalt.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStop.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                self.cria_dic()
+                #self.cria_dic()
         elif enum == 7:
                 self.QT_btHalt.setStyleSheet("background-color:green")
                 
@@ -334,7 +328,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btStop.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStart.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                self.cria_dic()
+                #self.cria_dic()
 
     def mudanca_teamcolor(self, enum):
         if enum == 0:
@@ -434,7 +428,7 @@ class GUI_main_window(QDialog):
 
     def iniciarTransmissao(self):
         self.looping = threading.Timer(0.02, self.iniciarTransmissao)
-        self.cria_dic()
+        #self.cria_dic()
         self.looping.start()
 
     def terminarTransmissao(self):
