@@ -131,6 +131,8 @@ class GUI_main_window(QDialog):
 
         self.looping_img.start()
         self.pixmap = cv2.imread('Field.jpg')
+
+        bola = cv2.circle(self.pixmap, self.ball, 30, (0,165,255), -1)
         for i in range(0,3):
             try:
                 novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i].x,self.robots_blue[i].y)
