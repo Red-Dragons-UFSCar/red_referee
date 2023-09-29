@@ -62,8 +62,8 @@ class GUI_main_window(QDialog):
         
         field = vision.get_field_data()
 
-        self.our_bots = field["our_bots"]
-        self.their_bots = field["their_bots"]
+        self.robots_blue = field["robots_blue"]
+        self.robots_yellow = field["robots_yellow"]
         self.ball= field["ball"]
 
         self.draw_all()
@@ -133,21 +133,21 @@ class GUI_main_window(QDialog):
         self.pixmap = cv2.imread('Field.jpg')
         for i in range(0,3):
             try:
-                novo_x, novo_y= self.cm_to_pxl(self.our_bots[i].x,self.our_bots[i].y)
+                novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i].x,self.robots_blue[i].y)
                 p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
                 team = "blue"
-                self.draw_robot(p1,p2,p3,p4,self.our_bots[i].a, team)
+                self.draw_robot(p1,p2,p3,p4,self.robots_blue[i].a, team)
                 print(i)
-                print(self.their_bots[i].x)
+                print(self.robots_yellow[i].x)
             except IndexError:
                 pass
                 
         for i in range(0,3):
             try:
-                novo_x, novo_y = self.cm_to_pxl(self.their_bots[i], self.their_bots[i].y)
+                novo_x, novo_y = self.cm_to_pxl(self.robots_yellow[i], self.robots_yellow[i].y)
                 p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
                 team = "Yellow"
-                self.draw_robot(p1,p2,p3,p4,self.their_bots[i].a, team)
+                self.draw_robot(p1,p2,p3,p4,self.robots_yellow[i].a, team)
             except IndexError:
                 pass
 
