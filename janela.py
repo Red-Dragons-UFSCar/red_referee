@@ -71,7 +71,7 @@ class GUI_main_window(QDialog):
         Rotação dos robôs
         """
 
-        ANGLE = np.deg2rad(angle+180)
+        ANGLE = angle
         SIN = math.sin(ANGLE)
         COS = math.cos(ANGLE)
         
