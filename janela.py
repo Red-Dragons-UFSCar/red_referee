@@ -182,6 +182,8 @@ class GUI_main_window(QDialog):
         self.ball= self.field[0]["ball"]
 
         self.draw_robot()
+        
+        self.looping_img.start()
 
         
        
