@@ -69,9 +69,13 @@ class GUI_main_window(QDialog):
 
         """
         Rotação dos robôs
+
+        --------------------
+
+        Ângulo tá recebendo em radianos, como o Y cresce para baixo, tem que inverter para rotação correta
         """
 
-        ANGLE = angle
+        ANGLE = -angle
         SIN = math.sin(ANGLE)
         COS = math.cos(ANGLE)
         
@@ -123,7 +127,7 @@ class GUI_main_window(QDialog):
 
 
     def draw_all(self):
-        self.looping_img = threading.Timer(0.005, self.draw_all)
+        self.looping_img = threading.Timer(0.0065, self.draw_all)
 
         self.looping_img.start()
         self.pixmap = cv2.imread('Field.jpg')
@@ -135,8 +139,9 @@ class GUI_main_window(QDialog):
         self.robots_yellow = self.field[0]["robots_yellow"]
         self.ball= self.field[0]["ball"]
 
+        coordenadas = (self.ball['x'], self.ball['y'])
 
-        cv2.circle(self.pixmap, (self.ball[0]['x'], self.ball[0]['y']), -1, (265,165,0), -1)
+        cv2.circle(self.pixmap, coordenadas, -1, (265,165,0), -1)
         for i in range(0,3):
             try:
                 novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
