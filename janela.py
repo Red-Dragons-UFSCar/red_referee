@@ -63,15 +63,14 @@ class GUI_main_window(QDialog):
         
         global img
         global cache
-        img = cv2.imread('Field.jpg')
-
-        self.draw_all()
-        
+        img = cv2.imread('Field.jpg')        
 
         self.mray = False
         self.referee = Referee()
         self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
 
+        self.looping_img = threading.Timer(0.005, self.draw_all)
+        self.looping_img.start()
 
     def rotate(self,points, angle):
 
@@ -132,6 +131,7 @@ class GUI_main_window(QDialog):
                 p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),self.robots_blue[i]['orientation'])
                 pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
                 cv2.drawContours(cache, [pp], -1, (0, 0, 255), -1)
+                cache.setText(str(self.robots_blue[i]['id']),(novo_x,novo_y))
             except IndexError:
                 pass
             except AttributeError:
@@ -144,6 +144,7 @@ class GUI_main_window(QDialog):
                 p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),self.robots_yellow[i]['orientation'])
                 pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
                 cv2.drawContours(cache, [pp], -1, (255, 255, 0), -1)
+                cache.setText(str(self.robots_blue[i]['id']),(novo_x, novo_y))
             except IndexError:
                 pass
             except AttributeError:
@@ -182,8 +183,7 @@ class GUI_main_window(QDialog):
 
         self.draw_robot()
 
-        self.looping_img = threading.Timer(0.005, self.draw_all)
-        self.looping_img.start()
+        
        
 
         
