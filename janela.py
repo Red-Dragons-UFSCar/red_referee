@@ -184,9 +184,8 @@ class GUI_main_window(QDialog):
 
         self.draw_robot()
         
-        self.looping_img = threading.Timer(0.005, self.draw_all)
+        self.looping_img = threading.Timer(0.008, self.draw_all)
         self.looping_img.start()
-        self.looping_img.join()
 
         
        
