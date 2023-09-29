@@ -5,7 +5,7 @@ import threading
 import cv2
 import numpy as np
 import math
-from vss_communication import StrategyControl
+from vss_communication import StrategyControl, Referee
 
 
 class GUI_main_window(QDialog):
@@ -60,7 +60,7 @@ class GUI_main_window(QDialog):
         """
 	
         self.mray = False
-        #self.referee = Referee()
+        self.referee = Referee()
         self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
         self.draw_all()
 
@@ -71,7 +71,7 @@ class GUI_main_window(QDialog):
         Rotação dos robôs
         """
 
-        ANGLE = np.deg2rad(angle)
+        ANGLE = np.deg2rad(angle+180)
         SIN = math.sin(ANGLE)
         COS = math.cos(ANGLE)
         
@@ -103,10 +103,10 @@ class GUI_main_window(QDialog):
         return novo_x, novo_y
 
     def edges_robot(self,x,y):
-        x1 = x-850/170
-        x2 = x+850/170
-        y1 = y-850/170
-        y2 = y+850/170
+        x1 = x-7.5*850/170
+        x2 = x+7.5*850/170
+        y1 = y-7.5*850/170
+        y2 = y+7.5*850/170
         return (x1,y1),(x1,y2),(x2,y2),(x2,y1)
 
 
