@@ -103,10 +103,10 @@ class GUI_main_window(QDialog):
         return novo_x, novo_y
 
     def edges_robot(self,x,y):
-        x1 = x-7.5*850/170
-        x2 = x+7.5*850/170
-        y1 = y-7.5*850/170
-        y2 = y+7.5*850/170
+        x1 = x-(7.5/2)*850/170
+        x2 = x+(7.5/2)*850/170
+        y1 = y-(7.5/2)*850/170
+        y2 = y+(7.5/2)*850/170
         return (x1,y1),(x1,y2),(x2,y2),(x2,y1)
 
 
@@ -123,7 +123,7 @@ class GUI_main_window(QDialog):
 
 
     def draw_all(self):
-        self.looping_img = threading.Timer(0.008, self.draw_all)
+        self.looping_img = threading.Timer(0.004, self.draw_all)
 
         self.looping_img.start()
         self.pixmap = cv2.imread('Field.jpg')
@@ -136,7 +136,7 @@ class GUI_main_window(QDialog):
         self.ball= self.field[0]["ball"]
 
 
-        #bola = cv2.circle(self.pixmap, self.ball, 30, (0,165,255), -1)
+        cv2.circle(self.pixmap, self.ball, -1, (0,165,255), -1)
         for i in range(0,3):
             try:
                 novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
