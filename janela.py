@@ -5,8 +5,8 @@ import threading
 import cv2
 import numpy as np
 import math
+from vss_communication import StrategyControl
 
-from vss_communication import Referee
 
 class GUI_main_window(QDialog):
     def __init__(self, app):
@@ -17,8 +17,6 @@ class GUI_main_window(QDialog):
         """
         Juíz
         """
-        self.referee = Referee()
-
         self.btPararTransmissao.clicked.connect(self.terminarTransmissao)
         self.btJogar.clicked.connect(self.iniciarTransmissao)
 
@@ -60,15 +58,10 @@ class GUI_main_window(QDialog):
         """
         Visão do campo
         """
-
+	
+        self.mray = False
         #self.referee = Referee()
-        
-        field = vision.get_field_data()
-
-        self.robots_blue = field["robots_blue"]
-        self.robots_yellow = field["robots_yellow"]
-        self.ball= field["ball"]
-
+        self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
         self.draw_all()
 
 
@@ -130,29 +123,35 @@ class GUI_main_window(QDialog):
 
 
     def draw_all(self):
-        self.looping_img = threading.Timer(1, self.draw_all)
+        self.looping_img = threading.Timer(0.008, self.draw_all)
 
         self.looping_img.start()
         self.pixmap = cv2.imread('Field.jpg')
+        
+        self.vision.update(self.mray)
+        self.field = self.vision.get_data()
 
-        bola = cv2.circle(self.pixmap, self.ball, 30, (0,165,255), -1)
+        self.robots_blue = self.field[0]["robots_blue"]
+        self.robots_yellow = self.field[0]["robots_yellow"]
+        self.ball= self.field[0]["ball"]
+
+
+        #bola = cv2.circle(self.pixmap, self.ball, 30, (0,165,255), -1)
         for i in range(0,3):
             try:
-                novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i].x,self.robots_blue[i].y)
+                novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
                 p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
                 team = "blue"
-                self.draw_robot(p1,p2,p3,p4,self.robots_blue[i].a, team)
-                print(i)
-                print(self.robots_yellow[i].x)
+                self.draw_robot(p1,p2,p3,p4,self.robots_blue[i]['orientation'], team)
             except IndexError:
                 pass
                 
         for i in range(0,3):
             try:
-                novo_x, novo_y = self.cm_to_pxl(self.robots_yellow[i], self.robots_yellow[i].y)
+                novo_x, novo_y = self.cm_to_pxl(self.robots_yellow[i]['x'], self.robots_yellow[i]['y'])
                 p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
                 team = "Yellow"
-                self.draw_robot(p1,p2,p3,p4,self.robots_yellow[i].a, team)
+                self.draw_robot(p1,p2,p3,p4,self.robots_yellow[i]['orientation'], team)
             except IndexError:
                 pass
 
