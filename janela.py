@@ -123,7 +123,7 @@ class GUI_main_window(QDialog):
 
 
     def draw_all(self):
-        self.looping_img = threading.Timer(0.004, self.draw_all)
+        self.looping_img = threading.Timer(0.005, self.draw_all)
 
         self.looping_img.start()
         self.pixmap = cv2.imread('Field.jpg')
@@ -136,7 +136,7 @@ class GUI_main_window(QDialog):
         self.ball= self.field[0]["ball"]
 
 
-        cv2.circle(self.pixmap, self.ball, -1, (0,165,255), -1)
+        cv2.circle(self.pixmap, (self.ball[0]['x'], self.ball[0]['y']), -1, (265,165,0), -1)
         for i in range(0,3):
             try:
                 novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
