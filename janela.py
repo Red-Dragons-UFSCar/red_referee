@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import math
 
+from vss_communication import Referee
 
 class GUI_main_window(QDialog):
     def __init__(self, app):
@@ -16,6 +17,8 @@ class GUI_main_window(QDialog):
         """
         Juíz
         """
+        self.referee = Referee()
+
         self.btPararTransmissao.clicked.connect(self.terminarTransmissao)
         self.btJogar.clicked.connect(self.iniciarTransmissao)
 
