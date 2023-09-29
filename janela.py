@@ -5,6 +5,7 @@ import threading
 import cv2
 import numpy as np
 import math
+
 from vss_communication import StrategyControl, Referee
 
 
@@ -59,6 +60,12 @@ class GUI_main_window(QDialog):
         Visão do campo
         """
 	
+        
+        global img
+        global cache
+        img = cv2.imread('Field.jpg')
+        
+
         self.mray = False
         self.referee = Referee()
         self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
@@ -118,19 +125,16 @@ class GUI_main_window(QDialog):
         if team == "blue":
             p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),angle)
             pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
-            cv2.drawContours(self.pixmap, [pp], -1, (0, 0, 255), -1)
+            cv2.drawContours(cache, [pp], -1, (0, 0, 255), -1)
         else:
             p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),angle)
             pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
-            cv2.drawContours(self.pixmap, [pp], -1, (255, 255, 0), -1)
+            cv2.drawContours(cache, [pp], -1, (255, 255, 0), -1)
                 
 
 
     def draw_all(self):
-        self.looping_img = threading.Timer(0.0065, self.draw_all)
-
-        self.looping_img.start()
-        self.pixmap = cv2.imread('Field.jpg')
+        cache = img.copy()
         
         self.vision.update(self.mray)
         self.field = self.vision.get_data()
@@ -139,9 +143,16 @@ class GUI_main_window(QDialog):
         self.robots_yellow = self.field[0]["robots_yellow"]
         self.ball= self.field[0]["ball"]
 
-        coordenadas = (self.ball['x'], self.ball['y'])
 
-        cv2.circle(self.pixmap, coordenadas, -1, (265,165,0), -1)
+        try:
+            coordenadas_cm_x, coordenadas_cm_y = self.cm_to_pxl(self.ball[0]['x'], self.ball[0]['y']) 
+            coordenadas_pxl = (int(coordenadas_cm_x),int(coordenadas_cm_y))
+            cv2.circle(cache, coordenadas_pxl, int(10.5), (265,165,0), -1)
+        except IndexError:
+            pass
+        except AttributeError:
+            pass
+
         for i in range(0,3):
             try:
                 novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
@@ -150,7 +161,9 @@ class GUI_main_window(QDialog):
                 self.draw_robot(p1,p2,p3,p4,self.robots_blue[i]['orientation'], team)
             except IndexError:
                 pass
-                
+            except AttributeError:
+                pass
+
         for i in range(0,3):
             try:
                 novo_x, novo_y = self.cm_to_pxl(self.robots_yellow[i]['x'], self.robots_yellow[i]['y'])
@@ -159,6 +172,8 @@ class GUI_main_window(QDialog):
                 self.draw_robot(p1,p2,p3,p4,self.robots_yellow[i]['orientation'], team)
             except IndexError:
                 pass
+            except AttributeError:
+                pass
 
 
         """
@@ -166,9 +181,12 @@ class GUI_main_window(QDialog):
 
         Não sei o pq precisa ser assim, mas sempre que tentei gerar a imagem de outra forma deu erro, duvida? Fica alterando os valores de pixmap.shape/pixmap.stride
         """
-        _q_image = QImage(self.pixmap, self.pixmap.shape[1], self.pixmap.shape[0], self.pixmap.strides[0], QImage.Format_RGB888)
+        _q_image = QImage(cache, cache.shape[1], cache.shape[0], cache.strides[0], QImage.Format_RGB888)
         _q_pixmap = QPixmap.fromImage(_q_image)
         self.QT_jogar.setPixmap(_q_pixmap)
+
+        self.looping_img = threading.Timer(0.005, self.draw_all)
+        self.looping_img.start()
        
 
         
