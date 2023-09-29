@@ -70,12 +70,7 @@ class GUI_main_window(QDialog):
         self.referee = Referee()
         self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
 
-        self.draw_all
-
-        #self.looping_img = threading.Timer(0.005, self.draw_all)
-        #self.looping_img.start()
-        #self.looping_img.join()
-
+        self.draw_all()
 
 
     def rotate(self,points, angle):
@@ -180,16 +175,20 @@ class GUI_main_window(QDialog):
 
     def draw_all(self):
         
-        while True:
-            self.vision.update(self.mray)
-            self.field = self.vision.get_data()
+        self.vision.update(self.mray)
+        self.field = self.vision.get_data()
 
-            self.robots_blue = self.field[0]["robots_blue"]
-            self.robots_yellow = self.field[0]["robots_yellow"]
-            self.ball= self.field[0]["ball"]
+        self.robots_blue = self.field[0]["robots_blue"]
+        self.robots_yellow = self.field[0]["robots_yellow"]
+        self.ball= self.field[0]["ball"]
 
-            self.draw_robot()
-            sleep(0.005)
+        self.draw_robot()
+        
+        self.looping_img = threading.Timer(0.005, self.draw_all)
+        self.looping_img.start()
+        self.looping_img.join()
+
+        
        
 
         
