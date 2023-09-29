@@ -6,46 +6,6 @@ import cv2
 import numpy as np
 import math
 
-class Entity_Blue:
-    def __init__(self, x=0, y=0, vx=0, vy=0, a=0, va=0, index=0):
-        """
-        Salva posição do robô aliado
-        """
-        self.x = x
-        self.y = y
-        self.vx = 0
-        self.vy = 0
-        self.a = a
-        self.va = 0
-        self.index = index
-
-class Entity_Yellow:
-    def __init__(self, x=0, y=0, vx=0, vy=0, a=0, va=0, index=0):
-        """"
-        Salva posição do robô adversário
-        """
-        self.x = x
-        self.y = y
-        self.vx = 0
-        self.vy = 0
-        self.a = a
-        self.va = 0
-        self.index = index
-
-class Entity_ball:
-    def __init__(self, x=0, y=0, vx = 0 , vy = 0, a = None, va = None, index = None):
-        """"
-        Salva posição da bola
-        """
-        self.x = x
-        self.y = y
-        self.vx = 0
-        self.vy = 0
-        self.a = a
-        self.va = 0
-        self.index = None
-
-
 
 class GUI_main_window(QDialog):
     def __init__(self, app):
@@ -53,7 +13,9 @@ class GUI_main_window(QDialog):
         loadUi("main_window.ui", self)
         self.show()
 
-        #Parte do juíz
+        """
+        Juíz
+        """
         self.btPararTransmissao.clicked.connect(self.terminarTransmissao)
         self.btJogar.clicked.connect(self.iniciarTransmissao)
 
@@ -92,32 +54,27 @@ class GUI_main_window(QDialog):
         self.FaltaAnterior = 4
         self.CorAnterior = 2
 
-        #self.contador_pos = 0
+        """
+        Visão do campo
+        """
 
         #self.referee = Referee()
         
-        
+        field = vision.get_field_data()
 
-        Robo0Amarelo = Entity_Yellow(index = 0)
-        Robo1Amarelo = Entity_Yellow(index = 1)
-        Robo2Amarelo = Entity_Yellow(index = 2)
-
-
-        self.Entidades_Amarelas = [Robo0Amarelo, Robo1Amarelo, Robo2Amarelo]
-
-        Robo0Azul = Entity_Blue(index = 0)
-        Robo1Azul = Entity_Blue(index = 1)
-        Robo2Azul = Entity_Blue(index = 2)
-
-
-        self.Entidades_Azul = [Robo0Azul, Robo1Azul, Robo2Azul]
-
-        self.Entidade_Bola = Entity_ball
+        self.our_bots = field["our_bots"]
+        self.their_bots = field["their_bots"]
+        self.ball= field["ball"]
 
         self.draw_all()
 
 
     def rotate(self,points, angle):
+
+        """
+        Rotação dos robôs
+        """
+
         ANGLE = np.deg2rad(angle)
         SIN = math.sin(ANGLE)
         COS = math.cos(ANGLE)
@@ -140,8 +97,8 @@ class GUI_main_window(QDialog):
         #pxl 850x650
         #Origem dos cm, canto inferior esquerdo, cresce para cima
         #Origem dos pxl, canto superior esquerdo, cresce para baixo
-        novo_x = x
-        novo_y = y
+        novo_x = (x*850/170)
+        novo_y = (650-y*650/130 + 100)
         """
         pos_bolax = (imagem.centroids[0][0][0][0])*170/640
         pos_bolay = ((480 - imagem.centroids[0][0][0][1])*130/480)
@@ -150,10 +107,10 @@ class GUI_main_window(QDialog):
         return novo_x, novo_y
 
     def edges_robot(self,x,y):
-        x1 = x-14.5
-        x2 = x+14.5
-        y1 = y-14.5
-        y2 = y+14.5
+        x1 = x-850/170
+        x2 = x+850/170
+        y1 = y-850/170
+        y2 = y+850/170
         return (x1,y1),(x1,y2),(x2,y2),(x2,y1)
 
 
@@ -171,51 +128,48 @@ class GUI_main_window(QDialog):
 
     def draw_all(self):
         self.looping_img = threading.Timer(1, self.draw_all)
-        """
-        self.contador_pos = self.contador_pos + 50
-        for i in range(0,3):
-            self.Entidades_Azul[i].x = 100 + self.contador_pos*0.1
-            self.Entidades_Azul[i].y = 200 + self.contador_pos*0.1
-            self.Entidades_Azul[i].a = 10 + self.contador_pos*0.1
-            self.Entidades_Amarelas[i].x = 600 + self.contador_pos*0.1
-            self.Entidades_Amarelas[i].y = 400 + self.contador_pos*0.1
-            self.Entidades_Amarelas[i].a = 10 + self.contador_pos*0.1
-            self.Entidade_Bola.x = self.contador_pos*0.1
-            self.Entidade_Bola.y = self.contador_pos*0.1
-        """
+
         self.looping_img.start()
         self.pixmap = cv2.imread('Field.jpg')
         for i in range(0,3):
             try:
-                novo_x, novo_y= self.cm_to_pxl(self.Entidades_Azul[i].x,self.Entidades_Azul[i].y)
+                novo_x, novo_y= self.cm_to_pxl(self.our_bots[i].x,self.our_bots[i].y)
                 p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
                 team = "blue"
-                self.draw_robot(p1,p2,p3,p4,self.Entidades_Azul[i].a, team)
+                self.draw_robot(p1,p2,p3,p4,self.our_bots[i].a, team)
                 print(i)
-                print(self.Entidades_Amarelas[i].x)
+                print(self.their_bots[i].x)
             except IndexError:
                 pass
                 
         for i in range(0,3):
             try:
-                p1,p2,p3,p4 = self.edges_robot(self.Entidades_Amarelas[i].x,self.Entidades_Amarelas[i].y)
+                novo_x, novo_y = self.cm_to_pxl(self.their_bots[i], self.their_bots[i].y)
+                p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
                 team = "Yellow"
-                self.draw_robot(p1,p2,p3,p4,self.Entidades_Amarelas[i].a, team)
+                self.draw_robot(p1,p2,p3,p4,self.their_bots[i].a, team)
             except IndexError:
                 pass
 
-        _q_image = QImage(self.pixmap, self.pixmap.shape[1], self.pixmap.shape[0], self.pixmap.strides[0], QImage.Format_RGB888)
-        _q_pixmap = QPixmap.fromImage(_q_image)
-        self.QT_jogar.setPixmap(_q_pixmap)
+
         """
         Corrigir ângulo da imagem
 
-        Não sei o pq precisa ser assim, mas sempre que tentei gerar a imagem de outra forma deu erro, dúvida? fica alterando os valores de pixmap.shape/pixmap.stride
+        Não sei o pq precisa ser assim, mas sempre que tentei gerar a imagem de outra forma deu erro, duvida? Fica alterando os valores de pixmap.shape/pixmap.stride
         """
+        _q_image = QImage(self.pixmap, self.pixmap.shape[1], self.pixmap.shape[0], self.pixmap.strides[0], QImage.Format_RGB888)
+        _q_pixmap = QPixmap.fromImage(_q_image)
+        self.QT_jogar.setPixmap(_q_pixmap)
+       
 
         
 
     def mudanca_quadrante(self,enum):
+        """
+        Funcionalidade das trocas de quadrantes no referee
+        """
+
+
         if enum == 1:
             if self.quadrante == 1:
                 self.quadrante = 0
@@ -261,6 +215,9 @@ class GUI_main_window(QDialog):
             
 
     def mudanca_foul(self,enum):
+        """
+        Funcionalidade da troca de fouls no juíz
+        """
         if enum == 1:
             if self.FaltaAtual == 1:
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
@@ -273,7 +230,7 @@ class GUI_main_window(QDialog):
                 self.QT_btFreeBall.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btGoalKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            #self.cria_dic()
+            self.cria_dic()
             self.quadrante = 0
         elif enum == 2:
             if self.FaltaAtual == 2:
@@ -288,7 +245,7 @@ class GUI_main_window(QDialog):
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.color = 2
                 self.RegistraFalta()
-            #self.cria_dic()
+            self.cria_dic()
             self.quadrante = 0
 
         elif enum == 4:
@@ -303,7 +260,7 @@ class GUI_main_window(QDialog):
                 self.QT_btFreeBall.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            #self.cria_dic()
+            self.cria_dic()
             self.quadrante = 0
         elif enum == 3:
             self.color = 2
@@ -319,7 +276,7 @@ class GUI_main_window(QDialog):
                 self.QT_btKickOff.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            #self.cria_dic()
+            self.cria_dic()
             
         elif enum == 5:
                 self.QT_btStop.setStyleSheet("background-color:green")
@@ -329,7 +286,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btHalt.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStart.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                #self.cria_dic()
+                self.cria_dic()
         elif enum == 6:
                 self.QT_btStart.setStyleSheet("background-color:green")
                 
@@ -338,7 +295,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btHalt.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStop.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                #self.cria_dic()
+                self.cria_dic()
         elif enum == 7:
                 self.QT_btHalt.setStyleSheet("background-color:green")
                 
@@ -347,7 +304,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btStop.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStart.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                #self.cria_dic()
+                self.cria_dic()
 
     def mudanca_teamcolor(self, enum):
         if enum == 0:
@@ -447,7 +404,7 @@ class GUI_main_window(QDialog):
 
     def iniciarTransmissao(self):
         self.looping = threading.Timer(0.02, self.iniciarTransmissao)
-        ##self.cria_dic()
+        self.cria_dic()
         self.looping.start()
 
     def terminarTransmissao(self):
