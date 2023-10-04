@@ -71,6 +71,7 @@ class GUI_main_window(QDialog):
         self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
 
         self.draw_all()
+        self.get_vision_data()
 
 
     def rotate(self,points, angle):
@@ -125,6 +126,7 @@ class GUI_main_window(QDialog):
     def draw_robot(self):
         cache = img.copy()
 
+
         for i in range(0,3):
             try:
                 novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
@@ -170,11 +172,9 @@ class GUI_main_window(QDialog):
         _q_image = QImage(cache, cache.shape[1], cache.shape[0], cache.strides[0], QImage.Format_RGB888)
         _q_pixmap = QPixmap.fromImage(_q_image)
         self.QT_jogar.setPixmap(_q_pixmap)
-                
 
+    def get_vision_data(self):
 
-    def draw_all(self):
-        
         self.vision.update(self.mray)
         self.field = self.vision.get_data()
 
@@ -182,9 +182,20 @@ class GUI_main_window(QDialog):
         self.robots_yellow = self.field[0]["robots_yellow"]
         self.ball= self.field[0]["ball"]
 
-        self.draw_robot()
         
-        self.looping_img = threading.Timer(0.008, self.draw_all)
+        self.looping_data = threading.Timer(0.009, self.get_vision_data)
+        self.looping_data.start()
+
+
+
+
+
+
+
+    def draw_all(self):
+        self.draw_robot()
+
+        self.looping_img = threading.Timer(0.015, self.draw_all)
         self.looping_img.start()
 
         
@@ -431,7 +442,7 @@ class GUI_main_window(QDialog):
         self.qt_UltimaFalta.setText(textoAntigo)
 
     def iniciarTransmissao(self):
-        self.looping = threading.Timer(0.02, self.iniciarTransmissao)
+        self.looping = threading.Timer(0.1, self.iniciarTransmissao)
         self.cria_dic()
         self.looping.start()
 
@@ -442,8 +453,10 @@ class GUI_main_window(QDialog):
         try:
             self.looping.cancel()
             self.looping_img.cancel()
+            self.looping_data.cancel()
             event.accept()
         except:
+            self.looping_data.cancel()
             self.looping_img.cancel()
             event.accept()
 
