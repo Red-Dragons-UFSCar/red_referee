@@ -5,20 +5,18 @@ import threading
 import cv2
 import numpy as np
 import math
-from time import sleep
-
-from vss_communication import StrategyControl, Referee
-
+#from vss_communication import StrategyControl, Referee
 
 class GUI_main_window(QDialog):
     def __init__(self, app):
         super(GUI_main_window, self).__init__()
-        loadUi("main_window.ui", self)
+        loadUi("main_window.ui",self)
         self.show()
 
         """
         Juíz
         """
+
         self.btPararTransmissao.clicked.connect(self.terminarTransmissao)
         self.btJogar.clicked.connect(self.iniciarTransmissao)
 
@@ -60,15 +58,14 @@ class GUI_main_window(QDialog):
         """
         Visão do campo
         """
-	
         
         global img
         global cache
-        img = cv2.imread('Field.jpg')        
+        img = cv2.imread('Field.jpg')   
 
-        self.mray = False
-        self.referee = Referee()
-        self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
+        #self.mray = False
+        #self.referee = Referee()
+        #self.vision = StrategyControl(ip='224.5.23.2', port=10015, yellowTeam=self.mray, logger=False, pattern='ssl', convert_coordinates=True)  # Criação do objeto do controle e estratégia
 
         self.draw_all()
         self.get_vision_data()
@@ -108,14 +105,11 @@ class GUI_main_window(QDialog):
         #Origem dos pxl, canto superior esquerdo, cresce para baixo
         novo_x = (x*850/170)
         novo_y = (650-y*650/130 + 100)
-        """
-        pos_bolax = (imagem.centroids[0][0][0][0])*170/640
-        pos_bolay = ((480 - imagem.centroids[0][0][0][1])*130/480)
-        """
 
         return novo_x, novo_y
 
     def edges_robot(self,x,y):
+        "Comentar explicação do tamanho"
         x1 = x-(7.5/2)*850/170
         x2 = x+(7.5/2)*850/170
         y1 = y-(7.5/2)*850/170
@@ -126,15 +120,19 @@ class GUI_main_window(QDialog):
     def draw_robot(self):
         cache = img.copy()
 
-
         for i in range(0,3):
             try:
+                "Comentar sobre protobuff"
                 novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
                 p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
                 p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),self.robots_blue[i]['orientation'])
                 pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
+                """
+                Mede o tempo de desenho do draw contours
+                """
                 cv2.drawContours(cache, [pp], -1, (0, 0, 255), -1)
-                cache.setText(str(self.robots_blue[i]['id']),(novo_x,novo_y))
+                "Corrigir indexição"
+                #cache.setText(str(self.robots_blue[i]['id']),(novo_x,novo_y))
             except IndexError:
                 pass
             except AttributeError:
@@ -147,7 +145,8 @@ class GUI_main_window(QDialog):
                 p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),self.robots_yellow[i]['orientation'])
                 pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
                 cv2.drawContours(cache, [pp], -1, (255, 255, 0), -1)
-                cache.setText(str(self.robots_blue[i]['id']),(novo_x, novo_y))
+                "Corrigir indexição"
+                #cache.setText(str(self.robots_blue[i]['id']),(novo_x, novo_y))
             except IndexError:
                 pass
             except AttributeError:
@@ -155,9 +154,9 @@ class GUI_main_window(QDialog):
         
 
         try:
-            coordenadas_cm_x, coordenadas_cm_y = self.cm_to_pxl(self.ball['x'], self.ball['y']) 
-            #coordenadas_cm_x, coordenadas_cm_y = self.cm_to_pxl(100, 100)
+            coordenadas_cm_x, coordenadas_cm_y = self.cm_to_pxl(self.ball['x'], self.ball['y'])
             coordenadas_pxl = (int(coordenadas_cm_x),int(coordenadas_cm_y))
+            "Comentar sobre tamanho bolinha"
             cv2.circle(cache, coordenadas_pxl, int(10.5), (265,165,0), -1)
         except IndexError:
             pass
@@ -173,14 +172,16 @@ class GUI_main_window(QDialog):
         _q_pixmap = QPixmap.fromImage(_q_image)
         self.QT_jogar.setPixmap(_q_pixmap)
 
+
     def get_vision_data(self):
 
-        self.vision.update(self.mray)
-        self.field = self.vision.get_data()
 
-        self.robots_blue = self.field[0]["robots_blue"]
-        self.robots_yellow = self.field[0]["robots_yellow"]
-        self.ball= self.field[0]["ball"]
+        #self.vision.update(self.mray)
+        #self.field = self.vision.get_data()
+
+        #self.robots_blue = self.field[0]["robots_blue"]
+        #self.robots_yellow = self.field[0]["robots_yellow"]
+        #self.ball = self.field[0]["ball"]
 
         
         self.looping_data = threading.Timer(0.009, self.get_vision_data)
@@ -189,17 +190,13 @@ class GUI_main_window(QDialog):
 
 
 
-
-
-
     def draw_all(self):
+        "Existe a possibilidade de poder deletar essa função"
         self.draw_robot()
 
         self.looping_img = threading.Timer(0.015, self.draw_all)
         self.looping_img.start()
 
-        
-       
 
         
 
@@ -256,6 +253,8 @@ class GUI_main_window(QDialog):
     def mudanca_foul(self,enum):
         """
         Funcionalidade da troca de fouls no juíz
+
+        Só atualiza o dicionário quando aperta uma das fouls possíveis (self.RegistraFalta() atualiza o dicionário)
         """
         if enum == 1:
             if self.FaltaAtual == 1:
@@ -269,7 +268,7 @@ class GUI_main_window(QDialog):
                 self.QT_btFreeBall.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btGoalKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            self.cria_dic()
+            #self.cria_dic()
             self.quadrante = 0
         elif enum == 2:
             if self.FaltaAtual == 2:
@@ -284,7 +283,7 @@ class GUI_main_window(QDialog):
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.color = 2
                 self.RegistraFalta()
-            self.cria_dic()
+            #self.cria_dic()
             self.quadrante = 0
 
         elif enum == 4:
@@ -299,7 +298,7 @@ class GUI_main_window(QDialog):
                 self.QT_btFreeBall.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            self.cria_dic()
+            #self.cria_dic()
             self.quadrante = 0
         elif enum == 3:
             self.color = 2
@@ -315,7 +314,7 @@ class GUI_main_window(QDialog):
                 self.QT_btKickOff.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btPenaltyKick.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.RegistraFalta()
-            self.cria_dic()
+            #self.cria_dic()
             
         elif enum == 5:
                 self.QT_btStop.setStyleSheet("background-color:green")
@@ -325,7 +324,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btHalt.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStart.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                self.cria_dic()
+                #self.cria_dic()
         elif enum == 6:
                 self.QT_btStart.setStyleSheet("background-color:green")
                 
@@ -334,7 +333,7 @@ class GUI_main_window(QDialog):
 
                 self.QT_btHalt.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStop.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                self.cria_dic()
+                #self.cria_dic()
         elif enum == 7:
                 self.QT_btHalt.setStyleSheet("background-color:green")
                 
@@ -343,9 +342,13 @@ class GUI_main_window(QDialog):
 
                 self.QT_btStop.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
                 self.QT_btStart.setStyleSheet("QPushButton{color: rgb(255, 255, 255); background-color: #9F1823;}QPushButton:hover{color: rgb(255, 255, 255);background-color: #ff0000;}")
-                self.cria_dic()
+                #self.cria_dic()
 
     def mudanca_teamcolor(self, enum):
+        """
+        Não atualiza o dicionário enviado para a estratégia
+        """
+
         if enum == 0:
             if self.Color == 0:
                 self.Colorolor = 2
@@ -434,6 +437,10 @@ class GUI_main_window(QDialog):
         elif self.CorAnterior == 2:
             self.CorTextoAnterior = ", No color"
 
+        """
+        Enviando para a interface o texto de foul enviado para a estratégia
+        """
+
         textoAtual = "Caso atual:" +str(self.FaltaTextoAtual) +str(self.CorTextoAtual) +str(self.QuadranteTextoAtual)
         textoAntigo = "Caso Anterior:" +str(self.FaltaTextoAnterior) +str(self.CorTextoAnterior) +str(self.QuadranteTextoAnterior)
 
@@ -442,8 +449,11 @@ class GUI_main_window(QDialog):
         self.qt_UltimaFalta.setText(textoAntigo)
 
     def iniciarTransmissao(self):
+        """
+        Looping dos dados de foul
+        """
         self.looping = threading.Timer(0.1, self.iniciarTransmissao)
-        self.cria_dic()
+        #self.cria_dic()
         self.looping.start()
 
     def terminarTransmissao(self):
