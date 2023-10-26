@@ -157,7 +157,7 @@ class GUI_main_window(QDialog):
             coordenadas_cm_x, coordenadas_cm_y = self.cm_to_pxl(self.ball['x'], self.ball['y'])
             coordenadas_pxl = (int(coordenadas_cm_x),int(coordenadas_cm_y))
             "Comentar sobre tamanho bolinha"
-            cv2.circle(cache, coordenadas_pxl, int(10.5), (265,165,0), -1)
+            cv2.circle(cache, coordenadas_pxl, int(10.5), (255,165,0), -1)
         except IndexError:
             pass
         except AttributeError:
