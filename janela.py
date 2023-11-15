@@ -1,3 +1,51 @@
+"""
+Lembrar de atualizar as opções de botões da interface de acordo com as necessidades de regras novas, é importante avisar que
+nem todas as regras estão funcionando perfeitamente para o VSSS.
+
+Também, esse código foi desenvolvido tendo em mente comunição por protobuff, porém, a última versão do github será com tudo relacionado
+ao protobuff comentado, caso for mantido o uso do mesmo, descomentar. Foram usados apenas comentários por "#"
+
+Alguns problemas identificados:
+
+    - Delay entre recebimento de informação e geração da imagem
+
+    - Não foi possível escrever os números de cada robô
+
+    - Possível problema: Quando estava gerando essa interface, foi solicitado que o dicionário à ser enviado para o Controle só fosse
+    atualizado ao ser apertado um dos botões de fouls, isso pode gerar problema caso o botão de foul seja apertado antes do quadrante,
+    por exemplo. Verificar se isso vai causar problemas mesmo, como não foi possível testar com outros usuários, não foi confirmado 
+    esse possível problema
+
+
+Ideia de soluções:
+
+Ideia para o problema de delay
+    -   Arrumar outra maneira para gerar os quadrados de robôs, suposição que talvez seja esse o problema no delay.
+        Algo tipo usar a função cv2.drawContours() para gerar todos os quadrados de um time e uma vez só.
+        Sem ideia de como realizar isso.
+        Lembrar de verificar se é realmente o cv2.drawContours() que está gerando delay, é só uma suposição que deveria ter sido
+        testada por um membro, mas até o momento do comentário, não foi confirmada
+    
+    -   Outra possibilidade que o problema de delay seja inerente do python na geração dos quadrados, assim, foi levantada a ideia
+        migrar para C++, além dele ser mais completo para QtDesigner, é uma linguagem mais rápida que python.
+
+
+Ideia para o problema de não estar sendo possível escrever os números de cada robô:
+Pode também solucionar o problema de delay:
+    -   Gerar um Qlabel que "anda" ao invés de gerar o quadrado no campo, algo tipo:
+        # Girar o QLabel 90 graus
+        transform = QTransform()
+        transform.rotate(90)
+        lbl_robot_blue_0.setTransform(transform)
+
+        #NÃO FOI TESTADO
+        #NÃO FOI CRIADO O "lbl_robot_blue_0", CRIAR ANTES DE TESTAR
+        #Tive essa ideia quando já no fim da área da Visão Computacional, simplesmente não quis testar <3
+
+Talvez solucione o problema de delay pois não será mais necessário gerar o frame com todas novas informações (Tipo robôs, ângulos e bola).
+Apenas seria andado o Qlabel representando cada robô. Vai haver a necessidade de achar uma solução para caso seja perdido um robô.
+"""
+
 from PyQt5.QtWidgets import QDialog, QLabel
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.uic import loadUi
@@ -109,7 +157,14 @@ class GUI_main_window(QDialog):
         return novo_x, novo_y
 
     def edges_robot(self,x,y):
-        "Comentar explicação do tamanho"
+        """
+        O tamanho dos robôs no VSSS era de 7,5 cm, para tanto, foi feito o cálculo de conversão, por isso o 7,5/2
+        nas definições de X,Y
+
+        O 850 se refere aos pixels em X do pixmap
+        O 170 se refere aos cms em X do campo
+        Convertendo assim de cm para pixels
+        """
         x1 = x-(7.5/2)*850/170
         x2 = x+(7.5/2)*850/170
         y1 = y-(7.5/2)*850/170
@@ -122,16 +177,18 @@ class GUI_main_window(QDialog):
 
         for i in range(0,3):
             try:
-                "Comentar sobre protobuff"
+                """
+                Protobuff tá passando as informações de maneira diferente às necessáris para gerar o desenho do robô, então
+                antes de desenhar, é necessário várias etapas de conversão de dados
+                """
                 novo_x, novo_y= self.cm_to_pxl(self.robots_blue[i]['x'],self.robots_blue[i]['y'])
                 p1,p2,p3,p4 = self.edges_robot(novo_x, novo_y)
                 p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),self.robots_blue[i]['orientation'])
                 pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
-                """
-                Mede o tempo de desenho do draw contours
-                """
                 cv2.drawContours(cache, [pp], -1, (0, 0, 255), -1)
-                "Corrigir indexição"
+                """
+                Corrigir indexição caso necessário
+                """
                 #cache.setText(str(self.robots_blue[i]['id']),(novo_x,novo_y))
             except IndexError:
                 pass
@@ -145,7 +202,6 @@ class GUI_main_window(QDialog):
                 p1_draw,p2_draw,p3_draw,p4_draw = self.rotate((p1,p2,p3,p4),self.robots_yellow[i]['orientation'])
                 pp = np.array([p1_draw,p2_draw,p3_draw,p4_draw])
                 cv2.drawContours(cache, [pp], -1, (255, 255, 0), -1)
-                "Corrigir indexição"
                 #cache.setText(str(self.robots_blue[i]['id']),(novo_x, novo_y))
             except IndexError:
                 pass
@@ -156,7 +212,10 @@ class GUI_main_window(QDialog):
         try:
             coordenadas_cm_x, coordenadas_cm_y = self.cm_to_pxl(self.ball['x'], self.ball['y'])
             coordenadas_pxl = (int(coordenadas_cm_x),int(coordenadas_cm_y))
-            "Comentar sobre tamanho bolinha"
+            """
+            O tamanho da bolinha do VSSS era de 2,1 cms, diferente dos robôs eu calculei o valor de cms para pixels e coloquei direto,
+            sendo essa conversão os 10.5 visto abaixo
+            """
             cv2.circle(cache, coordenadas_pxl, int(10.5), (255,165,0), -1)
         except IndexError:
             pass
@@ -166,7 +225,8 @@ class GUI_main_window(QDialog):
         """
         Corrigir ângulo da imagem
 
-        Não sei o pq precisa ser assim, mas sempre que tentei gerar a imagem de outra forma deu erro, duvida? Fica alterando os valores de pixmap.shape/pixmap.stride
+        Não sei o pq precisa ser assim, mas sempre que tentei gerar a imagem de outra forma deu erro, duvida?
+        Fica alterando os valores de pixmap.shape/pixmap.stride
         """
         _q_image = QImage(cache, cache.shape[1], cache.shape[0], cache.strides[0], QImage.Format_RGB888)
         _q_pixmap = QPixmap.fromImage(_q_image)
@@ -191,7 +251,11 @@ class GUI_main_window(QDialog):
 
 
     def draw_all(self):
-        "Existe a possibilidade de poder deletar essa função"
+        """
+        Talvez essa função possa ser deletada, só tá aqui porque eu supus que separar aquisição de dados (função acima) e desenho
+        não só pudesse reduzir o delay caso separados, como não era necessário gerar 100 fps de imagem para notebooks de 60fps
+        enquanto a aquisição rola em aproximademente 100 fps
+        """
         self.draw_robot()
 
         self.looping_img = threading.Timer(0.015, self.draw_all)
@@ -469,5 +533,3 @@ class GUI_main_window(QDialog):
             self.looping_data.cancel()
             self.looping_img.cancel()
             event.accept()
-
-    
